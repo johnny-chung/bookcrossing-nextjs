@@ -20,13 +20,13 @@ export default async function MessagesPage({
   params,
   searchParams,
 }: {
-  params: { lang: LangType; postId: string };
-  searchParams: {
+  params: Promise<{ lang: LangType; postId: string }>;
+  searchParams: Promise<{
     [key: string]: string | string[] | undefined | number;
     participantId: string;
     page?: number;
     nextMsgId?: string;
-  };
+  }>;
 }) {
   const session = await auth();
   const { lang, postId } = await params;

@@ -11,7 +11,11 @@ import { getLanguage } from "@/app/languages/_getLanguage";
 import { auth } from "@/app/_lib/authentication/auth";
 import { getMemberByAuth0Id } from "@/app/_modules/member/member.services";
 
-export default async function page({ params }: { params: { lang: LangType } }) {
+export default async function page({
+  params,
+}: {
+  params: Promise<{ lang: LangType }>;
+}) {
   const { lang } = await params;
   const langPack = await getLanguage(lang);
   const session = await auth();

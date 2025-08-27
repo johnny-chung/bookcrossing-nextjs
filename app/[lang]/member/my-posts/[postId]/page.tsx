@@ -21,8 +21,8 @@ export default async function PostDetailPage({
   params,
   searchParams,
 }: {
-  params: { lang: LangType; postId: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ lang: LangType; postId: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { lang, postId } = await params;
   const langPack = await getLanguage(lang);

@@ -34,39 +34,38 @@ The project was initiated to address the need for a user-friendly, scalable, and
 
 <table>
   <tr>
-    <td><img src="https://raw.githubusercontent.com/vercel/next.js/canary/packages/app/logo.svg" alt="Next.js" width="40"/></td>
+    <td><img src="/public/next.svg" alt="Next.js" width="40"/></td>
     <td><b>Next.js</b><br>React framework for server-side rendering and routing</td>
   </tr>
   <tr>
-    <td><img src="https://raw.githubusercontent.com/microsoft/TypeScript/main/docs/static/logo.svg" alt="TypeScript" width="40"/></td>
+    <td><img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Typescript_logo_2020.svg" alt="TypeScript" width="40"/></td>
     <td><b>TypeScript</b><br>Type-safe development</td>
   </tr>
   <tr>
-    <td><img src="https://raw.githubusercontent.com/tailwindlabs/brand/master/tailwindcss-mark.svg" alt="TailwindCSS" width="40"/></td>
+    <td><img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Tailwind_CSS_Logo.svg" alt="TailwindCSS" width="40"/></td>
     <td><b>TailwindCSS</b><br>Utility-first CSS framework for rapid UI development</td>
   </tr>
   <tr>
-    <td><img src="https://avatars.githubusercontent.com/u/139895814?s=200&v=4" alt="shadcn/ui" width="40"/></td>
+    <td></td>
     <td><b>shadcn/ui</b><br>Accessible, customizable UI components</td>
   </tr>
   <tr>
     <td><img src="https://cdn.auth0.com/blog/auth0-logo.svg" alt="Auth0" width="40"/></td>
-    <td><b>Auth0</b><br>Authentication and user management</td>
-  </tr>
+    <td><b>Auth0-logo</b><br>Authentication and user management</td>
   <tr>
-    <td><img src="https://raw.githubusercontent.com/colinhacks/zod/master/logo.svg" alt="Zod" width="40"/></td>
-    <td><b>Zod</b><br>Type validation and schema enforcement</td>
+    <td><img src="/public/zod.svg" wi-logodth="40"/></td>
+    <td><b>Zod</b><br>Type schema enforcement</td>
   </tr>
   <tr>
     <td><img src="https://react.dev/images/logo.svg" alt="React" width="40"/></td>
-    <td><b>React Hooks</b><br>Custom hooks for mobile detection and state management</td>
+    <td><b>React<br>Custom hooks for mobile detection and state management</td>
   </tr>
   <tr>
-    <td><img src="https://postcss.org/assets/logo.svg" alt="PostCSS" width="40"/></td>
+    <td><img src="https://poshttps:/ment</.dev/images/logobd/logo.svg" alt="PostCSS" width="40"/></td>
     <td><b>PostCSS</b><br>CSS transformations</td>
   </tr>
   <tr>
-    <td><img src="https://eslint.org/assets/images/logo.svg" alt="ESLint" width="40"/></td>
+    <td><img src="https:/https://.org/assets/logoCSSint.org/assets/images/logo.svg" alt="ESLint" width="40"/></td>
     <td><b>ESLint</b><br>Code linting and quality</td>
   </tr>
   <tr>
@@ -104,6 +103,21 @@ The project was initiated to address the need for a user-friendly, scalable, and
    ```
 3. **Configure environment variables:**
    - Create a `.env.local` file for Auth0, database, etc.
+   - Include the folowing in your file:
+        - AUTH0_ISSUER_BASE_URL
+        - AUTH0_CLIENT_ID
+        - AUTH0_CLIENT_SECRET
+        - AUTH0_AUDIENCE
+        - AUTH0_BASE_URL
+        - AUTH0_MGT_CLIENT_ID
+        - AUTH0_MGT_CLIENT_SECRET
+        - AUTH0_MGT_AUDIENCE
+        - AUTH0_MGT_ENDPOINT
+        - AUTH0_MGT_CONNECTION
+        - AUTH_SECRET # Added by `npx auth`
+        - GOOGLE_API_KEY
+        - BACKEND_URL
+
 4. **Run the development server:**
    ```bash
    npm run dev
@@ -135,7 +149,7 @@ Contributions are welcome! Please fork the repo and submit a pull request. For m
 For questions, job opportunities, or feedback:
 
 - **Author:** Johnny C.
-- **LinkedIn:** [[your-linkedin-url](https://www.linkedin.com/in/johnny-wychung/)]
+- **LinkedIn:** [johnny-wychung](https://www.linkedin.com/in/johnny-wychung/)
 
 ---
 

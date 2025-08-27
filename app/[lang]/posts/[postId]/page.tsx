@@ -18,7 +18,7 @@ import Image from "next/image";
 export default async function PostDetailPage({
   params,
 }: {
-  params: { lang: LangType; postId: string };
+  params: Promise<{ lang: LangType; postId: string }>;
 }) {
   const { lang, postId } = await params;
   const langPack = await getLanguage(lang);

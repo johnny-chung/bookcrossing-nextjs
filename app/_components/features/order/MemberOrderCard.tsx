@@ -20,16 +20,24 @@ export function MemberOrderCard({ order }: { order: OrderType }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    const node = ref.current; // capture it once
+
+    if (!node) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) setVisible(true);
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.unobserve(node);
+        }
       },
       { threshold: 0.2 }
     );
 
-    if (ref.current) observer.observe(ref.current);
+    observer.observe(node);
+
     return () => {
-      if (ref.current) observer.unobserve(ref.current);
+      observer.unobserve(node);
     };
   }, []);
 

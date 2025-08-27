@@ -14,12 +14,12 @@ export default async function MessagesPage({
   params,
   searchParams,
 }: {
-  params: { lang: LangType; postId: string; participantId: string };
-  searchParams: {
+  params: Promise<{ lang: LangType; postId: string; participantId: string }>;
+  searchParams: Promise<{
     [key: string]: string | string[] | undefined | number;
     page?: number;
     nextMsgId?: string;
-  };
+  }>;
 }) {
   const session = await auth();
   const { lang, postId, participantId } = await params;

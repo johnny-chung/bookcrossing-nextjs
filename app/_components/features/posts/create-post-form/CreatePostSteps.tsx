@@ -38,7 +38,7 @@ export default function CreatePostSteps({
         });
       }, 150);
     }
-  }, [book]);
+  }, [book, openSteps]);
 
   return (
     <Accordion

@@ -17,8 +17,8 @@ export default async function OrderDetailPage({
   params,
   searchParams,
 }: {
-  params: { lang: LangType; orderId: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ lang: LangType; orderId: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { lang, orderId } = await params;
   const langPack = await getLanguage(lang);
