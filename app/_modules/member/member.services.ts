@@ -6,6 +6,7 @@ import { CreateMemberRequestAuth0Dto } from "@/app/_modules/member/dto/create-me
 import { CreateMemberResponseDto } from "./dto/create-member-response.dto";
 import { MemberDetailsDto } from "./dto/member-details.dto";
 import { access } from "fs";
+import { BACKEND_URL } from "@/app/_lib/constant/backend";
 
 export async function createUser(
   userData: CreateMemberRequestAuth0Dto
@@ -13,8 +14,6 @@ export async function createUser(
   try {
     // Validate the input data
     const parsedData = CreateUserSchema.parse(userData);
-    const session = await auth();
-    if (!session) throw new Error("User not authenticated");
 
     // Call the Auth0 user creation service
     const userId = await createAuth0User(parsedData);
@@ -26,7 +25,7 @@ export async function createUser(
       email: parsedData.email,
     };
 
-    const response = await fetch("/members", {
+    const response = await fetch(`${BACKEND_URL}/members`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,15 +52,25 @@ export async function getMemberByAuth0Id(
   } else {
     token = accessToken;
   }
+  console.log(
+    "Fetching member by Auth0 ID:",
+    encodeURIComponent(auth0Id),
+    "with token:",
+    token
+  );
 
-  const response = await fetch(`/members/${encodeURIComponent(auth0Id)}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await fetch(
+    `${BACKEND_URL}/members/profile/${encodeURIComponent(auth0Id)}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
+  console.log("res", JSON.stringify(response));
   if (!response.ok) {
     throw new Error("Failed to fetch member");
   }

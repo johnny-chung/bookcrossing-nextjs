@@ -38,7 +38,7 @@ export default function SelectBook({
       {...props}
     >
       <SearchInput />
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 p-2 lg:p-4">
         {googleBooks.items?.length &&
           googleBooks.items.map((book, idx) => (
             <Card
@@ -46,11 +46,11 @@ export default function SelectBook({
               onClick={() => handleBookSelect(book)}
               className={cn(
                 "cursor-pointer hover:shadow-lg hover:bg-accent/35 transition-shadow duration-200",
-                isSelected(book) && "bg-accent shadow-lg border-2",
+                isSelected(book) && "bg-accent shadow-lg border-2"
               )}
             >
-              <CardContent>
-                <div className="relative w-40 aspect-3/4 mx-4 mt-2">
+              <CardContent className="px-2 xl:px-4">
+                <div className="relative w-40 md:w-30 lg:w-36 aspect-3/4 mx-auto mt-2">
                   <Image
                     src={
                       book.volumeInfo.imageLinks?.thumbnail ||

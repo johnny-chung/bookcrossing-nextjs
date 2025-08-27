@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const CreatePostFormSchema = z.object({
-  postById: z.string().min(1),
+  postBy: z.string().min(1),
   isbn: z.string().min(10),
   location: z.string().min(1),
   remarks: z.string().optional(),
@@ -13,7 +13,7 @@ export type CreatePostFormState =
   | {
       formErrors?: string[];
       fieldErrors?: {
-        postById?: string[];
+        postBy?: string[];
         isbn?: string[];
         location?: string[];
         remarks?: string[];

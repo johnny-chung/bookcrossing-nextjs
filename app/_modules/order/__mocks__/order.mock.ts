@@ -118,6 +118,6 @@ export const mockOrders: OrderType[] = [
       bookRef: { ...mockBookRef, id: "book-4", title: "Book Four" },
     },
     createdAt: "2025-08-06T11:00:00.000Z",
-    orderStatus: OrderStatus.CANCELLED,
+    orderStatus: OrderStatus.CANCELED,
   },
 ];

@@ -34,7 +34,7 @@ export function MemberOrderCard({ order }: { order: OrderType }) {
   }, []);
 
   return (
-    <Link href={`/member/my-orders/${order.id}`}>
+    <Link href={`/member/my-reservations/${order.id}`}>
       <Card
         ref={ref}
         className={`cursor-pointer hover:shadow-lg hover:bg-accent/35 transition-shadow duration-200 ${
@@ -42,7 +42,7 @@ export function MemberOrderCard({ order }: { order: OrderType }) {
         }`}
       >
         <div className="relative">
-          {order.orderStatus === OrderStatus.CANCELLED && (
+          {order.orderStatus === OrderStatus.CANCELED && (
             <Badge
               variant="default"
               className="absolute top-0 left-2 z-10 shadow-md animate-fadeInDelay"

@@ -37,13 +37,21 @@ export function CreatePostForm() {
   const form = useForm({
     resolver: zodResolver(CreatePostFormSchema),
     defaultValues: {
-      postById: session?.user?.id ?? "",
+      postBy: session?.user?.id ?? "",
       isbn:
         book?.volumeInfo?.industryIdentifiers?.[0]?.identifier ?? "mock-isbn",
       location: "",
       remarks: "",
     },
   });
+
+  // Update ISBN when book changes
+  React.useEffect(() => {
+    form.setValue(
+      "isbn",
+      book?.volumeInfo?.industryIdentifiers?.[0]?.identifier ?? "mock-isbn"
+    );
+  }, [book, form]);
 
   function onSubmit(values: CreatePostFormValues) {
     startTransition(async () => {
@@ -64,6 +72,14 @@ export function CreatePostForm() {
           </FormLabel>
           <span className="text-sm sm:text-base align-baseline">
             {book?.volumeInfo?.title || "-"}
+          </span>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center">
+          <FormLabel className="min-w-20 text-sm sm:text-base sm:-mb-2">
+            {langPack.isbn}:
+          </FormLabel>
+          <span className="text-sm sm:text-base align-baseline">
+            {book?.volumeInfo?.industryIdentifiers?.[0]?.identifier || "-"}
           </span>
         </div>
 
@@ -116,7 +132,7 @@ export function CreatePostForm() {
         />
         <FormField
           control={form.control}
-          name="postById"
+          name="postBy"
           render={({ field }) => (
             <FormItem className="hidden">
               <FormControl>
@@ -142,6 +158,13 @@ export function CreatePostForm() {
           </Button>
         </div>
       </form>
+      {serverState?.formErrors && (
+        <div className="text-red-500">
+          {serverState.formErrors.map((error, index) => (
+            <p key={index}>{error}</p>
+          ))}
+        </div>
+      )}
     </Form>
   );
 }

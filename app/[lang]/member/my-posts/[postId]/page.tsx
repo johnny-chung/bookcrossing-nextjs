@@ -1,26 +1,21 @@
-import { getLanguage } from "@/app/languages/_getLanguage";
-import { LangType } from "@/app/languages/_lang.types";
-import Image from "next/image";
-import React from "react";
-import { Separator } from "@/app/_components/ui/separator";
-import { TooltipButton } from "@/app/_components/ui/toottip-button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/app/_components/ui/collapsible";
-import { mockPost } from "@/app/_modules/post/__mocks__/post.mocks";
-import { format } from "date-fns";
-import Link from "next/link";
-import { PostStatus } from "@/app/_modules/post/post.type";
-import { Badge } from "@/app/_components/ui/badge";
-import {
-  cancelOrderAction,
-  completeOrderAction,
-} from "@/app/_modules/order/__mocks__/order.actions.mock";
+import BackBtn from "@/app/_components/common/BackBtn";
 import CancelOrderBtn from "@/app/_components/features/order/CancelOrderBtn";
 import CompleteOrderBtn from "@/app/_components/features/order/CompleteOrderBtn";
-import BackBtn from "@/app/_components/common/BackBtn";
+import { Badge } from "@/app/_components/ui/badge";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/app/_components/ui/popover";
+import { Separator } from "@/app/_components/ui/separator";
+import { TooltipButton } from "@/app/_components/ui/toottip-button";
+import { fetchPostById } from "@/app/_modules/post/post.services";
+import { PostStatus } from "@/app/_modules/post/post.type";
+import { getLanguage } from "@/app/languages/_getLanguage";
+import { LangType } from "@/app/languages/_lang.types";
+import { format } from "date-fns";
+import Image from "next/image";
+import Link from "next/link";
 
 export default async function PostDetailPage({
   params,
@@ -32,10 +27,10 @@ export default async function PostDetailPage({
   const { lang, postId } = await params;
   const langPack = await getLanguage(lang);
 
-  // const post = await fetchPostById(postId);
+  const post = await fetchPostById(postId);
 
   // Mocking the post detail for testing purposes
-  const post = mockPost;
+  //const post = mockPost;
 
   if (!post) {
     return <div>{langPack.postNotFound}</div>;
@@ -128,6 +123,10 @@ export default async function PostDetailPage({
           <Separator />
           <div className="flex flex-col gap-2 text-sm sm:text-base">
             <div>
+              <span className=" text-gray-500 sm:mr-4">{langPack.isbn}: </span>
+              <span>{post.bookDetails.isbn}</span>
+            </div>
+            <div>
               <span className=" text-gray-500 sm:mr-4">
                 {langPack.author}:{" "}
               </span>
@@ -149,20 +148,16 @@ export default async function PostDetailPage({
               <span className=" text-gray-500 sm:mr-4">
                 {langPack.description}:
               </span>
-              <Collapsible>
-                <CollapsibleTrigger>
-                  {post.bookDetails.textSnippet}
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  {post.bookDetails.description}
-                </CollapsibleContent>
-              </Collapsible>
+              <Popover>
+                <PopoverTrigger>{post.bookDetails.textSnippet}</PopoverTrigger>
+                <PopoverContent>{post.bookDetails.description}</PopoverContent>
+              </Popover>
             </div>
           </div>
           <Separator />
         </div>
       </div>
-      <BackBtn />
+      <BackBtn replacementPath="/member/my-posts" />
     </div>
   );
 }

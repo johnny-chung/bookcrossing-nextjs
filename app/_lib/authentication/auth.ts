@@ -1,3 +1,4 @@
+import { MemberDetailsDto } from "@/app/_modules/member/dto/member-details.dto";
 import { getMemberByAuth0Id } from "@/app/_modules/member/member.services";
 import { MemberStatus } from "@/app/_modules/member/member.type";
 import NextAuth, { Account, type User } from "next-auth";
@@ -40,18 +41,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     jwt: async ({ token, account, user, profile }) => {
       if (account) {
-        console.log("account: ", account);
+        //console.log("account: ", account);
         token.accessToken = account.access_token;
         token.accessTokenExpires = account.expires_at ?? null;
       }
       if (user && account?.access_token) {
-        // to-do
         // fetch user info from member service
-        const dbUser = await getMemberByAuth0Id(
-          user.sub ?? "",
-          account.access_token
-        );
-
+        let dbUser: MemberDetailsDto | undefined = undefined;
+        try {
+          dbUser = await getMemberByAuth0Id(
+            user.sub ?? "",
+            account.access_token
+          );
+        } catch (error) {
+          console.error("Failed to fetch user from member service:", error);
+        }
+        console.log("dbuser: ", dbUser);
         token.user = {
           ...user,
           id: dbUser?.id ?? user.sub,
@@ -74,7 +79,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           (token.accessTokenExpires as number) * 1000
         ).toISOString() as Date & string;
       }
-      console.log("session: ", session);
+      console.log("accessToken: ", session.accessToken);
       return session;
     },
     authorized: async ({ auth }) => {

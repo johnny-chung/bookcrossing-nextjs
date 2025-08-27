@@ -1,7 +1,10 @@
+import BackBtn from "@/app/_components/common/BackBtn";
 import ConversationBox from "@/app/_components/features/messages/ConversationBox";
 import PostSummaryPopover from "@/app/_components/features/messages/PostSummaryPopover";
 import { auth } from "@/app/_lib/authentication/auth";
 import { mockGetPaginatedConversation } from "@/app/_modules/message/__mocks__/message.mocks";
+import { getPaginatedConversation } from "@/app/_modules/message/message.services";
+
 import { mockPost } from "@/app/_modules/post/__mocks__/post.mocks";
 import { fetchPostById } from "@/app/_modules/post/post.services";
 import { getLanguage } from "@/app/languages/_getLanguage";
@@ -26,13 +29,19 @@ export default async function MessagesPage({
   const langPack = await getLanguage(lang);
 
   //const post = await getPostById(postId);
-  const post = mockPost; // Mocking the post detail for testing purposes
-  const conversation = await mockGetPaginatedConversation(
+  // const post = mockPost; // Mocking the post detail for testing purposes
+  // const conversation = await mockGetPaginatedConversation(
+  //   postId,
+  //   participantId,
+  //   page ?? 1,
+  //   10,
+  //   nextMsgId ?? undefined
+  // );
+  const post = await fetchPostById(postId);
+  const conversation = await getPaginatedConversation(
     postId,
     participantId,
-    page ?? 1,
-    10,
-    nextMsgId ?? undefined
+    page ?? 1
   );
 
   if (!post) {
@@ -52,27 +61,35 @@ export default async function MessagesPage({
 
   // check name
   let receiverName = "";
-  if (session && post.postBy.auth0Id === session.user.id) {
+  if (session && post.postBy.auth0Id === session.user.sub) {
     receiverName = post.postBy.name;
   } else {
     receiverName = post.orderRef?.orderBy.name || "Unknown User";
+  }
+  let receiverId = "";
+  let senderId = "";
+  if (session && session.user.id === participantId) {
+    senderId = session.user.id;
+    receiverId = post.postBy.id;
+  } else {
+    senderId = post.postBy.id;
+    receiverId = participantId;
   }
 
   return (
     <div className="w-full flex flex-col justify-center max-w-6xl mx-auto gap-2 p-4">
       <div className="flex flex-row justify-center gap-6 mb-2">
         <PostSummaryPopover post={post} />
-        <p className="text-xl font-semibold">
-          {langPack.messagesWith.replace("...", receiverName)}
-        </p>
       </div>
       <ConversationBox
-        senderId="user1"
-        receiverId="user2"
-        postId="post1"
-        participantId="user2"
+        senderId={senderId}
+        receiverId={receiverId}
+        receiverName={receiverName}
+        postId={postId}
+        participantId={participantId}
         paginatedConversation={conversation}
       />
+      <BackBtn />
     </div>
   );
 }

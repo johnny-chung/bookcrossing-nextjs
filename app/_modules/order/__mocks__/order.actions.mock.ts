@@ -66,7 +66,7 @@ export async function cancelOrderAction(
 ): Promise<CancelOrderResponseDto> {
   return {
     id: dto.id,
-    orderStatus: OrderStatus.CANCELLED,
+    orderStatus: OrderStatus.CANCELED,
     postRef: mockPostRef,
   };
 }

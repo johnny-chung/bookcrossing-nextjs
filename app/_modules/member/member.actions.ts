@@ -1,15 +1,17 @@
 "use server";
-
+import { redirect } from "next/navigation";
 import z from "zod";
 import {
   CreateUserFormState,
   CreateUserInput,
   CreateUserSchema,
 } from "./zod/create-user-schema";
+import { createUser } from "./member.services";
 
 export async function createMemberAction(
   values: CreateUserInput
 ): Promise<CreateUserFormState> {
+  console.log("Creating member with values:", values);
   const validatedFields = CreateUserSchema.safeParse(values);
 
   if (!validatedFields.success) {
@@ -23,27 +25,21 @@ export async function createMemberAction(
   }
 
   try {
-    // Commenting out the real service call for testing purposes
-    // const user = createMessage({
-    //   senderId: validatedFields.data.senderId,
-    //   receiverId: validatedFields.data.receiverId,
-    //   postId: validatedFields.data.postId,
-    //   participantId: validatedFields.data.participantId,
-    //   content: validatedFields.data.content,
-    // });
-
     // Mock service call for testing
-    const mockUserId = "mock-user-id";
+    // const mockUserId = "mock-user-id";
 
-    
-    return {
-      success: true,
-      message: `User ${mockUserId} created successfully`,
-    };
+    const user = await createUser(validatedFields.data);
+    console.log("User created:", user);
+
+    // return {
+    //   success: true,
+    //   message: `User ${user.id} created successfully`,
+    // };
   } catch (error: any) {
     return {
       fieldErrors: { apiErrors: error?.message ?? "Something went wrong" },
       success: false,
     };
   }
+  redirect("/signin");
 }

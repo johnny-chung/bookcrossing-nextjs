@@ -6,15 +6,22 @@ import { useRouter } from "next/navigation";
 import React from "react";
 
 export default function BackBtn({
+  replacementPath,
   ...props
-}: React.ComponentProps<typeof Button>) {
+}: { replacementPath?: string } & React.ComponentProps<typeof Button>) {
   const { langPack } = useLang();
   const router = useRouter();
   return (
     <TooltipButton
       variant="outline"
       tooltipContent={langPack.back}
-      onClick={() => router.back()}
+      onClick={() => {
+        if (replacementPath) {
+          router.replace(replacementPath);
+        } else {
+          router.back();
+        }
+      }}
       className="mx-auto"
       {...props}
     >

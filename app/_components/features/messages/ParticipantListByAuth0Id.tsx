@@ -48,7 +48,7 @@ const ParticipantListByAuth0Id: React.FC<ParticipantListProps> = ({
     params.set("participantId", participantId);
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
-
+  console.log("participants:", participants);
   const content = (
     <div className="w-full h-[80vh] overflow-y-auto flex flex-col gap-4 p-2">
       {participants.map((p, idx) => (
@@ -63,7 +63,10 @@ const ParticipantListByAuth0Id: React.FC<ParticipantListProps> = ({
           >
             <CardHeader className="w-full">
               <CardTitle className="flex w-full space-between items-center">
-                <p className="flex-1">{p.postId}</p>
+                <div className="flex flex-col gap-1">
+                  <p className="flex-1">{p.bookRef.title}</p>
+                  <p className="text-xs text-gray-500">{p.postId}</p>
+                </div>
                 <CollapsibleTrigger asChild>
                   <Button
                     variant="ghost"
@@ -85,7 +88,9 @@ const ParticipantListByAuth0Id: React.FC<ParticipantListProps> = ({
                     key={idx}
                     onClick={() => handleSelect(p.postId, participant.id)}
                   >
-                    {participant.name}
+                    <p className="text-sm">
+                      {langPack.participant}: {participant.name}
+                    </p>
                   </div>
                 ))}
               </CollapsibleContent>

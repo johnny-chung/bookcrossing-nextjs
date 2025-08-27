@@ -1,19 +1,19 @@
-import { getLanguage } from "@/app/languages/_getLanguage";
-import { LangType } from "@/app/languages/_lang.types";
-import Image from "next/image";
-import React from "react";
-import { Separator } from "@/app/_components/ui/separator";
-import { TooltipButton } from "@/app/_components/ui/toottip-button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/app/_components/ui/collapsible";
-import { mockPost } from "@/app/_modules/post/__mocks__/post.mocks";
-import { format } from "date-fns";
-import { createOrderAction } from "@/app/_modules/order/__mocks__/order.actions.mock";
 import BackBtn from "@/app/_components/common/BackBtn";
 import ReserveBtn from "@/app/_components/features/posts/ReserveBtn";
+import { Button } from "@/app/_components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/app/_components/ui/popover";
+import { Separator } from "@/app/_components/ui/separator";
+import { TooltipButton } from "@/app/_components/ui/toottip-button";
+import { auth } from "@/app/_lib/authentication/auth";
+import { fetchPostById } from "@/app/_modules/post/post.services";
+import { getLanguage } from "@/app/languages/_getLanguage";
+import { LangType } from "@/app/languages/_lang.types";
+import { format } from "date-fns";
+import Image from "next/image";
 
 export default async function PostDetailPage({
   params,
@@ -22,13 +22,13 @@ export default async function PostDetailPage({
 }) {
   const { lang, postId } = await params;
   const langPack = await getLanguage(lang);
-
+  const session = await auth();
   // const post = await getPostDetail(postId);
 
   // Mocking the post detail for testing purposes
-  const post = mockPost;
-  //const post = await fetchPostById(postId);
-
+  //const post = mockPost;
+  const post = await fetchPostById(postId);
+  console.log("Fetched post: ", post);
   if (!post) {
     return <div>{langPack.postNotFound}</div>;
   }
@@ -76,7 +76,11 @@ export default async function PostDetailPage({
             </div>
 
             <div className="flex items-center gap-2 m-2 mx-auto">
-              <ReserveBtn postId={postId} />
+              {post.orderRef?.orderBy.id === session?.user?.id ? (
+                <Button disabled>{langPack.reserved}</Button>
+              ) : (
+                <ReserveBtn postId={postId} />
+              )}
               <TooltipButton
                 variant="outline"
                 tooltipContent={langPack.sendMessage}
@@ -87,6 +91,10 @@ export default async function PostDetailPage({
           </div>
           <Separator />
           <div className="flex flex-col gap-2 text-sm sm:text-base">
+            <div>
+              <span className=" text-gray-500 sm:mr-4">{langPack.isbn}: </span>
+              <span>{post.bookDetails.isbn}</span>
+            </div>
             <div>
               <span className=" text-gray-500 sm:mr-4">
                 {langPack.author}:{" "}
@@ -109,14 +117,10 @@ export default async function PostDetailPage({
               <span className=" text-gray-500 sm:mr-4">
                 {langPack.description}:
               </span>
-              <Collapsible>
-                <CollapsibleTrigger>
-                  {post.bookDetails.textSnippet}
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  {post.bookDetails.description}
-                </CollapsibleContent>
-              </Collapsible>
+              <Popover>
+                <PopoverTrigger>{post.bookDetails.textSnippet}</PopoverTrigger>
+                <PopoverContent>{post.bookDetails.description}</PopoverContent>
+              </Popover>
             </div>
           </div>
           <Separator />

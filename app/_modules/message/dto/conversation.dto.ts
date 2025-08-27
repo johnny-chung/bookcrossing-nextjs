@@ -11,8 +11,8 @@ export type GetConversationRequest = {
 export type GetConversationResponse = {
   messages: MessageType[];
   page: number;
+  startMsgId: string | null;
   nextMsgId?: string | null;
 };
-
 
 export type PaginatedConversation = GetConversationResponse[];

@@ -13,6 +13,7 @@ import {
   CancelOrderRequestDto,
   CancelOrderResponseDto,
 } from "./dto/cancel-order.dto";
+import { BACKEND_URL } from "@/app/_lib/constant/backend";
 
 const baseUrl = "/api/orders";
 
@@ -22,21 +23,23 @@ export async function createOrder(
   const session = await auth();
   console.log("creat post session: ", session);
   if (!session) throw new Error("User not authenticated");
-  
+
   try {
-    const res = await fetch(baseUrl, {
+    const res = await fetch(`${BACKEND_URL}/orders`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${session.accessToken}`,
       },
       body: JSON.stringify({ ...dto, memberId: session?.user.id }),
     });
 
     if (!res.ok) {
-      throw new Error(`Failed to create post: ${res.statusText}`);
+      throw new Error(`Failed to create order: ${res.statusText}`);
     }
 
     const resJson = await res.json();
+    console.log("create order response: ", resJson);
     return resJson;
   } catch (error) {
     throw error;
@@ -50,7 +53,7 @@ export async function completeOrder(
   if (!session) throw new Error("User not authenticated");
 
   try {
-    const res = await fetch(`${baseUrl}/${dto.id}/completed`, {
+    const res = await fetch(`${BACKEND_URL}/orders/${dto.id}/completed`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -73,7 +76,7 @@ export async function cancelOrder(
   if (!session) throw new Error("User not authenticated");
 
   try {
-    const res = await fetch(`${baseUrl}/${dto.id}/cancel`, {
+    const res = await fetch(`${BACKEND_URL}/orders/${dto.id}/cancel`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -93,11 +96,14 @@ export async function fetchOrderById(orderId: string): Promise<OrderType> {
   const session = await auth();
   if (!session) throw new Error("User not authenticated");
 
-  const res = await fetch(`${baseUrl}/${orderId}`, {
+  const res = await fetch(`${BACKEND_URL}/orders/${orderId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${session.accessToken}`,
+    },
+    next: {
+      tags: [`order-${orderId}`],
     },
   });
 
@@ -105,17 +111,40 @@ export async function fetchOrderById(orderId: string): Promise<OrderType> {
   return res.json();
 }
 
-export async function fetchOrdersByMember() {
+export async function fetchOrdersByMember({
+  status,
+  search,
+}: {
+  status?: string | string[];
+  search?: string;
+}): Promise<OrderType[]> {
   const session = await auth();
   if (!session) throw new Error("User not authenticated");
+
+  const params: URLSearchParams = new URLSearchParams();
+  if (status) {
+    if (typeof status === "string") {
+      params.append("language", status);
+    } else if (Array.isArray(status)) {
+      status.forEach((s) => params.append("status", s));
+    }
+  }
+  if (search) params.append("search", search);
+
   try {
-    const res = await fetch(`${baseUrl}/my-orders`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-    });
+    const res = await fetch(
+      `${BACKEND_URL}/orders/my-orders${params ? "?" : ""}${params.toString()}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        next: {
+          tags: [`member-orders-${session.user.id}`],
+        },
+      }
+    );
     if (!res.ok) throw new Error(`Failed to fetch order: ${res.statusText}`);
     return res.json();
   } catch (error) {
@@ -128,11 +157,14 @@ export async function fetchOrdersByPost(postId: string): Promise<OrderType[]> {
   if (!session) throw new Error("User not authenticated");
 
   try {
-    const res = await fetch(`${baseUrl}/postId/${postId}`, {
+    const res = await fetch(`${BACKEND_URL}/orders/postId/${postId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.accessToken}`,
+      },
+      next: {
+        tags: [`post-orders-${postId}`],
       },
     });
     if (!res.ok) throw new Error(`Failed to fetch order: ${res.statusText}`);
@@ -147,7 +179,7 @@ export async function fetchAllOrders(): Promise<OrderType[]> {
   if (!session) throw new Error("User not authenticated");
 
   try {
-    const res = await fetch(`${baseUrl}/all`, {
+    const res = await fetch(`${BACKEND_URL}/orders/all`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

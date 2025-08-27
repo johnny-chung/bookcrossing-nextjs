@@ -5,7 +5,10 @@ import {
   CreateMessageSchema,
 } from "@/app/_modules/message/zod/create-message.schema";
 import z from "zod";
-import { revalidateConversationCache } from "@/app/_modules/message/message.services";
+import {
+  createMessage,
+  revalidateConversationCache,
+} from "@/app/_modules/message/message.services";
 
 export async function createMessageAction(
   values: CreateMessageInput
@@ -24,16 +27,16 @@ export async function createMessageAction(
 
   try {
     // Commenting out the real service call for testing purposes
-    // const message = createMessage({
-    //   senderId: validatedFields.data.senderId,
-    //   receiverId: validatedFields.data.receiverId,
-    //   postId: validatedFields.data.postId,
-    //   participantId: validatedFields.data.participantId,
-    //   content: validatedFields.data.content,
-    // });
+    const messageId = createMessage({
+      senderId: validatedFields.data.senderId,
+      receiverId: validatedFields.data.receiverId,
+      postId: validatedFields.data.postId,
+      participantId: validatedFields.data.participantId,
+      content: validatedFields.data.content,
+    });
 
     // Mock service call for testing
-    const messageId = "mock-Message-id";
+    //const messageId = "mock-Message-id";
 
     revalidateConversationCache(
       validatedFields.data.postId,
@@ -51,4 +54,12 @@ export async function createMessageAction(
       success: false,
     };
   }
+}
+
+export async function revalidateConversationAction(
+  postId: string,
+  participantId: string,
+  page: number
+) {
+  revalidateConversationCache(postId, participantId, page);
 }

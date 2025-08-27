@@ -11,6 +11,10 @@ import { getLanguage } from "@/app/languages/_getLanguage";
 import { LangType } from "@/app/languages/_lang.types";
 import ParticipantListByPost from "@/app/_components/features/messages/ParticipantListByPost";
 import { SidebarProvider } from "@/app/_components/ui/sidebar";
+import {
+  getPaginatedConversation,
+  getParticipantListByPost,
+} from "@/app/_modules/message/message.services";
 
 export default async function MessagesPage({
   params,
@@ -31,21 +35,33 @@ export default async function MessagesPage({
 
   const langPack = await getLanguage(lang);
 
-  //const post = await getPostById(postId);
-  const post = mockPost; // Mocking the post detail for testing purposes
+  const post = await fetchPostById(postId);
+  //const post = mockPost; // Mocking the post detail for testing purposes
 
-  const participantList = mockGetParticipantListResponse;
+  // const participantList = mockGetParticipantListResponse;
 
-  const conversation = await mockGetPaginatedConversation(
+  // const conversation = await mockGetPaginatedConversation(
+  //   postId,
+  //   participantId,
+  //   page ?? 1,
+  //   10,
+  //   nextMsgId ?? undefined
+  // );
+
+  const participantList = await getParticipantListByPost({ postId });
+
+  const conversation = await getPaginatedConversation(
     postId,
-    participantId,
-    page ?? 1,
-    10,
-    nextMsgId ?? undefined
+    participantId ?? participantList?.participants[0]?.id ?? "",
+    page ?? 1
   );
 
   if (!post) {
     return <div>{langPack.postNotFound}</div>;
+  }
+
+  if (!participantList) {
+    return <div>{langPack.noMessages}</div>;
   }
 
   // comment out for testing purposes
@@ -61,10 +77,16 @@ export default async function MessagesPage({
 
   // check name
   let receiverName = "";
-  if (session && post.postBy.auth0Id === session.user.id) {
-    receiverName = post.postBy.name;
-  } else {
-    receiverName = post.orderRef?.orderBy.name || "Unknown User";
+  let receiverId = participantList?.participants[0]?.id ?? "";
+  const senderId = session?.user.id ?? "";
+  if (session && participantId) {
+    if (session.user.id === participantId) {
+      receiverId = post.postBy.id;
+      receiverName = post.postBy.name;
+    } else {
+      receiverId = participantId;
+      receiverName = post.orderRef?.orderBy.name ?? "";
+    }
   }
 
   return (
@@ -73,16 +95,21 @@ export default async function MessagesPage({
         {/* Participant List: left on desktop, top sidebar on mobile */}
         <div className="md:col-span-1 flex flex-col border p-2">
           <PostSummaryPopover post={post} />
-          <ParticipantListByPost participants={participantList.participants} />
+          <ParticipantListByPost
+            participants={participantList.participants}
+            participantId={participantId}
+          />
         </div>
         {/* Conversation Box: right on desktop, below on mobile */}
         <div className="md:col-span-3 flex">
           <ConversationBox
             receiverName={receiverName}
-            senderId="user1"
-            receiverId="user2"
+            senderId={senderId}
+            receiverId={receiverId}
             postId={postId}
-            participantId="user1"
+            participantId={
+              participantId ?? participantList?.participants[0]?.id
+            }
             paginatedConversation={conversation}
           />
         </div>

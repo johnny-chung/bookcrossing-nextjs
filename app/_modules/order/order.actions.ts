@@ -13,19 +13,22 @@ import {
   CancelOrderRequestDto,
   CancelOrderResponseDto,
 } from "@/app/_modules/order/dto/cancel-order.dto";
+import { redirect } from "next/navigation";
+import { revalidateTag } from "next/cache";
 
 export async function createOrderAction(
   dto: CreateOrderReqestDto
-): Promise<CreateOrderResponseDto> {
+): Promise<void> {
+  let res: CreateOrderResponseDto;
   try {
-    if (!dto.memberId || !dto.postId) {
-      throw new Error("Member ID and Post ID are required");
+    if (!dto.postId) {
+      throw new Error("Post ID are required");
     }
-    const res = await createOrder(dto);
-    return res;
+    res = await createOrder(dto);
   } catch (error: any) {
     throw new Error(error?.message ?? "Something went wrong");
   }
+  redirect(`/member/my-reservations/${res.id}`);
 }
 
 export async function completeOrderAction(
@@ -36,6 +39,7 @@ export async function completeOrderAction(
       throw new Error("Order ID is required");
     }
     const res = await completeOrder(dto);
+    revalidateTag(`order-${dto.id}`);
     return res;
   } catch (error: any) {
     throw new Error(error?.message ?? "Something went wrong");
@@ -44,14 +48,16 @@ export async function completeOrderAction(
 
 export async function cancelOrderAction(
   dto: CancelOrderRequestDto
-): Promise<CancelOrderResponseDto> {
+): Promise<void> {
+  let res: CancelOrderResponseDto;
   try {
     if (!dto.id) {
       throw new Error("Order ID is required");
     }
-    const res = await cancelOrder(dto);
-    return res;
+    res = await cancelOrder(dto);
+    revalidateTag(`order-${dto.id}`);
   } catch (error: any) {
     throw new Error(error?.message ?? "Something went wrong");
   }
+  redirect(`/member/my-reservations`);
 }

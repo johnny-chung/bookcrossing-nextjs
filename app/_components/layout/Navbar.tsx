@@ -67,12 +67,12 @@ const navMenuContent: {
       {
         title: "latest",
         href: "/posts?sort=latest",
-        description: "See the latest collections",
+        description: "seeLatestCollection",
       },
       {
         title: "all-books",
         href: "/posts",
-        description: "Browse all books",
+        description: "browseAllBooks",
       },
     ],
   },
@@ -83,17 +83,17 @@ const navMenuContent: {
       {
         title: "posts",
         href: "/member/my-posts",
-        description: "View your listed books",
+        description: "viewListedBooks",
       },
       {
         title: "reservations",
         href: "/member/my-reservations",
-        description: "View your reservations",
+        description: "viewReservations",
       },
       {
         title: "messages",
         href: "/member/my-messages",
-        description: "View your messages",
+        description: "viewMessages",
       },
     ],
   },
@@ -124,7 +124,7 @@ export default function Navbar() {
               <TooltipButton
                 variant="ghost"
                 className="my-2"
-                onClick={() => signOut({ redirect: false })}
+                onClick={() => signOut({ redirectTo: "/" })}
                 tooltipContent={langPack.logout}
               >
                 <LogOutIcon className="size-4" />
@@ -177,10 +177,10 @@ function NavBarWeb({ langPack }: { langPack: any }) {
                         href="/"
                       >
                         <div className="mt-4 mb-2 text-lg font-medium">
-                          Book Crossing
+                          {langPack.bookcrossing}
                         </div>
                         <p className="text-muted-foreground text-sm leading-tight">
-                          Share a book
+                          {langPack.goal}
                         </p>
                       </Link>
                     </NavigationMenuLink>
@@ -191,7 +191,7 @@ function NavBarWeb({ langPack }: { langPack: any }) {
                       title={langPack[subMenu.title]}
                       key={idx}
                     >
-                      {subMenu.description}
+                      {langPack[subMenu.description]}
                     </ListItem>
                   ))}
                 </ul>
@@ -203,7 +203,7 @@ function NavBarWeb({ langPack }: { langPack: any }) {
                       title={langPack[subMenu.title]}
                       key={idx}
                     >
-                      {subMenu.description}
+                      {langPack[subMenu.description]}
                     </ListItem>
                   ))}
                 </ul>
@@ -282,7 +282,7 @@ function NavBarMobile({ langPack }: { langPack: any }) {
                     <Button
                       variant="ghost"
                       className="cursor-pointer w-full"
-                      onClick={() => signOut({ redirect: false })}
+                      onClick={() => signOut({ redirectTo: "/" })}
                     >
                       <p>{langPack.logout}</p>
                     </Button>

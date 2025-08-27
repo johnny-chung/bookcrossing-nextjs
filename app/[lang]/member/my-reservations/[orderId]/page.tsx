@@ -5,6 +5,7 @@ import { Badge } from "@/app/_components/ui/badge";
 import { Separator } from "@/app/_components/ui/separator";
 import { TooltipButton } from "@/app/_components/ui/toottip-button";
 import { mockOrder } from "@/app/_modules/order/__mocks__/order.mock";
+import { fetchOrderById } from "@/app/_modules/order/order.services";
 import { OrderStatus } from "@/app/_modules/order/order.type";
 import { getLanguage } from "@/app/languages/_getLanguage";
 import { LangType } from "@/app/languages/_lang.types";
@@ -25,12 +26,15 @@ export default async function OrderDetailPage({
   // const post = await fetchPostById(postId);
 
   // Mocking the post detail for testing purposes
-  const order = mockOrder;
+  //const order = mockOrder;
+
+  const order = await fetchOrderById(orderId);
 
   if (!order) {
     return <div>{langPack.orderNotFound}</div>;
   }
 
+  console.log("Fetched order: ", order);
   const formattedDate = format(new Date(order.createdAt), "yyyy-MM-dd HH:mm");
 
   return (
@@ -46,6 +50,22 @@ export default async function OrderDetailPage({
             fill
             className="object-contain rounded-md p-4"
           />
+          {order.orderStatus === OrderStatus.CANCELED && (
+            <Badge
+              variant="default"
+              className="absolute top-0 left-2 z-10 shadow-md animate-fadeInDelay"
+            >
+              {langPack.cancelled}
+            </Badge>
+          )}
+          {order.orderStatus === OrderStatus.COMPLETED && (
+            <Badge
+              variant="secondary"
+              className="absolute top-0 left-2 z-10 shadow-md animate-fadeInDelay"
+            >
+              {langPack.completed}
+            </Badge>
+          )}
         </div>
 
         <div className="flex flex-col gap-4 w-full">
@@ -77,22 +97,14 @@ export default async function OrderDetailPage({
 
             <div className="flex flex-col w-full items-start gap-2 m-2 mx-auto">
               <Separator />
-              {order.orderStatus === OrderStatus.CANCELLED && (
-                <Badge
-                  variant="default"
-                  className="absolute top-0 left-2 z-10 shadow-md animate-fadeInDelay"
-                >
-                  {langPack.cancelled}
-                </Badge>
-              )}
-              {order.orderStatus === OrderStatus.COMPLETED && (
-                <Badge
-                  variant="secondary"
-                  className="absolute top-0 left-2 z-10 shadow-md animate-fadeInDelay"
-                >
-                  {langPack.completed}
-                </Badge>
-              )}
+
+              <div>
+                <span className=" text-gray-500 sm:mr-4">
+                  {langPack.status}:{" "}
+                </span>
+                <span>{langPack[order.orderStatus]}</span>
+              </div>
+
               <div>
                 <span className=" text-gray-500 sm:mr-4">
                   {langPack.orderBy}:{" "}

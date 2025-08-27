@@ -23,10 +23,12 @@ export type GetParticipantListResponse = MemberReferenceType[];
 
 interface ParticipantListProps {
   participants: GetParticipantListResponse;
+  participantId?: string;
 }
 
 const ParticipantListByPost: React.FC<ParticipantListProps> = ({
   participants,
+  participantId,
 }) => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -44,7 +46,9 @@ const ParticipantListByPost: React.FC<ParticipantListProps> = ({
       {participants.map((p) => (
         <Card
           key={p.id}
-          className="cursor-pointer hover:shadow-md transition-shadow"
+          className={`cursor-pointer hover:shadow-md transition-shadow ${
+            participantId === p.id ? "bg-grey" : ""
+          }`}
           onClick={() => handleSelect(p.id)}
         >
           <CardHeader>
@@ -66,7 +70,7 @@ const ParticipantListByPost: React.FC<ParticipantListProps> = ({
         tooltipContent={langPack.conversationList}
         asChild
       >
-        <SidebarTrigger className="flex md:hidden" asChild>
+        <SidebarTrigger className="flex md:hidden">
           <AlignJustifyIcon className="size-4" />
         </SidebarTrigger>
       </TooltipButton>

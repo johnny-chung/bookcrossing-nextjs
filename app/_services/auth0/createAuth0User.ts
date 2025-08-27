@@ -37,7 +37,7 @@ export async function createAuth0User(
     const resJson = await handleFetchResponse(res);
     return resJson.user_id;
   } catch (error: any) {
-    console.error(error?.message ?? "create auth0 user error");
+    console.error(`Auth0 Err: ${error?.message ?? "create auth0 user error"}`);
     throw error;
   }
 }

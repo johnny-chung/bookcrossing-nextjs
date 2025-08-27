@@ -14,6 +14,10 @@ import ParticipantListByPost from "@/app/_components/features/messages/Participa
 import ParticipantListByAuth0Id from "@/app/_components/features/messages/ParticipantListByAuth0Id";
 import { Sidebar } from "lucide-react";
 import { SidebarProvider } from "@/app/_components/ui/sidebar";
+import {
+  getPaginatedConversation,
+  getParticipantListByAuth0Id,
+} from "@/app/_modules/message/message.services";
 
 export default async function MyMessagesPage({
   params,
@@ -35,21 +39,25 @@ export default async function MyMessagesPage({
 
   const langPack = await getLanguage(lang);
 
-  //const post = await getPostById(postId);
-  const post = mockPost; // Mocking the post detail for testing purposes
+  //const post = mockPost; // Mocking the post detail for testing purposes
+  //const participantList = mockGetParticipantListByAuth0Id;
 
-  const participantList = mockGetParticipantListByAuth0Id;
-
-  const conversation = await mockGetPaginatedConversation(
-    postId,
-    participantId,
-    page ?? 1,
-    10,
-    nextMsgId ?? undefined
-  );
-
-  if (!post) {
-    return <div>{langPack.postNotFound}</div>;
+  // const conversation = await mockGetPaginatedConversation(
+  //   postId,
+  //   participantId,
+  //   page ?? 1,
+  //   10,
+  //   nextMsgId ?? undefined
+  // );
+  const participantList = await getParticipantListByAuth0Id();
+  let post, conversation;
+  if (participantList?.length > 0) {
+    post = await fetchPostById(postId ?? participantList?.[0]?.postId);
+    conversation = await getPaginatedConversation(
+      postId,
+      participantId ?? participantList?.[0]?.participants[0]?.id ?? "",
+      page ?? 1
+    );
   }
 
   // comment out for testing purposes
@@ -65,10 +73,18 @@ export default async function MyMessagesPage({
 
   // check name
   let receiverName = "";
-  if (session && post.postBy.auth0Id === session.user.id) {
-    receiverName = post.postBy.name;
-  } else {
-    receiverName = post.orderRef?.orderBy.name || "Unknown User";
+  let receiverId = "";
+  let senderId = "";
+  if (session && participantId && post) {
+    if (session.user.id === participantId) {
+      senderId = session.user.id;
+      receiverId = post.postBy.id;
+      receiverName = post.postBy.name;
+    } else {
+      senderId = post.postBy.id;
+      receiverId = participantId;
+      receiverName = post.orderRef?.orderBy.name ?? "";
+    }
   }
 
   return (
@@ -80,14 +96,20 @@ export default async function MyMessagesPage({
         </div>
         {/* Conversation Box: right on desktop, below on mobile */}
         <div className="md:col-span-3 flex">
-          <ConversationBox
-            receiverName={receiverName}
-            senderId="user1"
-            receiverId="user2"
-            postId={postId}
-            participantId="user1"
-            paginatedConversation={conversation}
-          />
+          {conversation ? (
+            <ConversationBox
+              receiverName={receiverName}
+              senderId={senderId}
+              receiverId={receiverId}
+              postId={postId}
+              participantId={
+                participantId ?? participantList?.[0]?.participants[0]?.id
+              }
+              paginatedConversation={conversation}
+            />
+          ) : (
+            <p>{langPack.noMessages}</p>
+          )}
         </div>
       </div>
     </SidebarProvider>

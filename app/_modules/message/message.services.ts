@@ -13,24 +13,31 @@ import {
 } from "./dto/participant-list.dto";
 import { MemberReferenceType } from "../member/member.type";
 import { auth } from "@/app/_lib/authentication/auth";
+import { BACKEND_URL } from "@/app/_lib/constant/backend";
 
 export async function getConversationPage(
   postId: string,
   participantId: string,
   page: number,
-  limit?: number,
+  startMsgId: string | null,
+  limit = 25,
   nextMsgId?: string
 ): Promise<GetConversationResponse> {
-  const searchParams = new URLSearchParams({
-    participantId: encodeURIComponent(participantId),
-    page: page.toString(),
-  });
+  if (!postId || !participantId || page < 1 || limit < 1) {
+    return { messages: [], page: 1, startMsgId: null, nextMsgId: null };
+  }
 
   const session = await auth();
   if (!session) throw new Error("User not authenticated");
 
-  if (limit) {
-    searchParams.append("limit", encodeURIComponent(limit.toString()));
+  const searchParams = new URLSearchParams({
+    participantId: encodeURIComponent(participantId),
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+
+  if (startMsgId) {
+    searchParams.append("startMsgId", encodeURIComponent(startMsgId));
   }
 
   if (nextMsgId) {
@@ -38,9 +45,9 @@ export async function getConversationPage(
   }
 
   const response = await fetch(
-    `/api/messages/conversation/${encodeURIComponent(
+    `${BACKEND_URL}/messages/conversation/${encodeURIComponent(
       postId
-    )}/?${searchParams.toString()}`,
+    )}?${searchParams.toString()}`,
     {
       method: "GET",
       headers: {
@@ -58,49 +65,45 @@ export async function getConversationPage(
 }
 
 const cache = new LRUCache({ max: 30, ttl: 60 * 60 * 1000 });
-export async function getPagniatedConversation(
+export async function getPaginatedConversation(
   postId: string,
   participantId: string,
-  page: number,
-  limit = 20,
-  nextMsgId?: string
+  page = 1,
+  limit = 25
 ): Promise<PaginatedConversation> {
   const cachedPages: PaginatedConversation = [];
 
-  for (let i = 1; i < page; i++) {
+  if (!postId || !participantId || page < 1 || limit < 1) {
+    return [];
+  }
+
+  for (let i = 1; i <= page; i++) {
     const cacheKey = `${postId}-${participantId}-${i}-${limit}`;
     const cachedData = cache.get(cacheKey) as GetConversationResponse;
-    if (cachedData) {
-      cachedPages.push(cachedData);
-    } else {
-      // If any page < page is not found in cache, fetch it
+
+    if (!cachedData) {
+      // Find the nearest previous cached page to use its nextMsgId as startMsgId
+      let startMsgId: string | null = null;
+      if (i > 1 || i === 1) {
+        const prevCacheKey = `${postId}-${participantId}-${i - 1}-${limit}`;
+        const prevPage = cache.get(prevCacheKey) as GetConversationResponse;
+        startMsgId = prevPage?.nextMsgId ?? null;
+      }
+
+      // If no previous page cached, start from null
       const conversation = await getConversationPage(
         postId,
         participantId,
         i,
+        startMsgId, // can be null
         limit
       );
+
       cache.set(cacheKey, conversation);
       cachedPages.push(conversation);
+    } else {
+      cachedPages.push(cachedData);
     }
-  }
-
-  // Fetch the requested page
-  const cacheKey = `${postId}-${participantId}-${page}-${limit}`;
-  const cachedData = cache.get(cacheKey) as GetConversationResponse;
-
-  if (!cachedData) {
-    const conversation = await getConversationPage(
-      postId,
-      participantId,
-      page,
-      limit,
-      nextMsgId
-    );
-    cache.set(cacheKey, conversation);
-    cachedPages.push(conversation);
-  } else {
-    cachedPages.push(cachedData);
   }
 
   return cachedPages;
@@ -110,16 +113,31 @@ export async function revalidateConversationCache(
   postId: string,
   participantId: string,
   page: number,
-  limit = 20
+  limit = 25
 ): Promise<void> {
   const cacheKey = `${postId}-${participantId}-${page}-${limit}`;
-  cache.delete(cacheKey);
+  const cachedData = cache.get(cacheKey) as GetConversationResponse;
+
+  let nextMsgId: string | null = null;
+  let startMsgId: string | null = null;
+  if (cachedData) {
+    startMsgId = cachedData.startMsgId ?? null;
+    if (page === 1) {
+      nextMsgId = cachedData.nextMsgId ?? null;
+      startMsgId = null; // For the first page, startMsgId should be null
+    }
+  }
+
   const conversation = await getConversationPage(
     postId,
     participantId,
     page,
-    limit
+    startMsgId,
+    limit,
+    nextMsgId ?? undefined
   );
+
+  cache.delete(cacheKey);
   cache.set(cacheKey, conversation);
 }
 
@@ -130,8 +148,8 @@ export async function createMessage(
   const parsedData = CreateMessageSchema.parse(messageData);
   const session = await auth();
   if (!session) throw new Error("User not authenticated");
-
-  const response = await fetch(`/api/messages`, {
+  console.log("create message data:", parsedData);
+  const response = await fetch(`${BACKEND_URL}/messages`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -145,6 +163,12 @@ export async function createMessage(
   }
 
   const data = await response.json();
+  console.log("Created message ID:", data.id);
+  await revalidateConversationCache(
+    parsedData.postId,
+    parsedData.participantId,
+    1
+  );
   return data.id;
 }
 
@@ -155,7 +179,9 @@ export async function getParticipantListByPost(
   if (!session) throw new Error("User not authenticated");
   try {
     const response = await fetch(
-      `/api/messages/conversation-list/${encodeURIComponent(request.postId)}`,
+      `${BACKEND_URL}/messages/conversation-list/${encodeURIComponent(
+        request.postId
+      )}`,
       {
         method: "GET",
         headers: {
@@ -178,13 +204,16 @@ export async function getParticipantListByAuth0Id(): Promise<GetParticipantListB
   const session = await auth();
   if (!session) throw new Error("User not authenticated");
   try {
-    const response = await fetch(`/api/messages/member/conversation-list`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-    });
+    const response = await fetch(
+      `${BACKEND_URL}/messages/member/conversation-list`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }
+    );
     if (!response.ok) {
       throw new Error("Failed to fetch participants");
     }

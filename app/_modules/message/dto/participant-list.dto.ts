@@ -1,3 +1,4 @@
+import { BookReferenceType } from "../../book/book.types";
 import { MemberReferenceType } from "../../member/member.type";
 
 export type GetParticipantListRequestByPost = {
@@ -6,6 +7,7 @@ export type GetParticipantListRequestByPost = {
 
 export type GetParticipantListResponseByPost = {
   postId: string;
+  bookRef: BookReferenceType;
   participants: MemberReferenceType[];
 };
 

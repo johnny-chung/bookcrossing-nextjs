@@ -13,7 +13,7 @@ export async function getGoogleBooks(
   const queryParam = isISBN ? `isbn:${query}` : encodeURIComponent(query);
 
   const response = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=${queryParam}&maxResults=10&key=${GOOGLE_API_KEY}`,
+    `https://www.googleapis.com/books/v1/volumes?q=${queryParam}&maxResults=25&key=${GOOGLE_API_KEY}`,
     {
       headers: {
         "Content-Type": "application/json",

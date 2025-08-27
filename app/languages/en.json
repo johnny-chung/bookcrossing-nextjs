@@ -15,8 +15,13 @@
   "filter": "Filter",
   "search": "Search",
   "sort": "Sort",
+  "sortDateAsc": "Date ↑",
+  "sortDateDesc": "Date ↓",
+  "reset": "Reset",
+  "apply": "Apply",
 
   "home": "Home",
+  "bookcrossing": "Book · Crossing",
   "goal": "Share, Discover, and Connect",
   "goalDesc": "Join our community to share books, discover new reads, and connect with fellow book lovers.",
   "about-us": "About Us",
@@ -29,6 +34,7 @@
 
   "books": "Books",
   "bookTitle": "Title",
+  "isbn": "ISBN",
   "author": "Author",
   "description": "Description",
   "language": "Language",
@@ -37,6 +43,11 @@
   "all-books": "All Books",
   "viewAllBooks": "View All Books",
   "viewAllBooksDesc": "Explore our extensive collection of books across various genres and languages.",
+  "seeLatestCollection": "See Latest Collection",
+  "browseAllBooks": "Browse All Books",
+  "viewListedBooks": "View Your Listed Books",
+  "viewReservations": "View Your Reservations",
+  "viewMessages": "View Your Messages",
 
   "member": "Member",
   "profile": "Profile",
@@ -73,6 +84,10 @@
   "reservedBy": "Reserved By",
   "viewYourPosts": "View Your Posts",
   "viewYourPostsDesc": "Manage your posts, view requests, and track your book reservations.",
+  "reserved": "Reserved",
+  "noPosts": "No Posts",
+  "notCreatedAnyPost": "You have not created any post yet.",
+  "shareYourFirstBook": "Share Your First Book",
 
   "orders": "Orders",
   "reservations": "Reservations",
@@ -84,6 +99,7 @@
   "orderNotFound": "Order Not Found",
   "cancelOrder": "Cancel Order",
   "markCompleted": "Mark as Completed",
+  "noReservations": "No Reservations",
 
   "message": "Message",
   "messages": "Messages",
@@ -91,7 +107,18 @@
   "messagesWith": "Messages with ...",
   "viewAllConversations": "View All Conversations",
   "conversationList": "Conversation List",
+  "noMessages": "No Messages",
+  "participant": "Participant",
 
   "location": "Meetup Location",
-  "remarks": "Remarks"
+  "remarks": "Remarks",
+
+  "CANCELED": "Cancelled",
+  "COMPLETED": "Completed",
+  "PENDING": "Pending",
+  "ACTIVE": "Active",
+  "AVAILABLE": "Available",
+  "CREATED": "Created",
+  "RESERVED": "Reserved",
+  "DELETED": "Deleted"
 }

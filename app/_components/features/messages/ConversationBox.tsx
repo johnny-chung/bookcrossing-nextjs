@@ -3,7 +3,11 @@ import { Button } from "@/app/_components/ui/button";
 import { Input } from "@/app/_components/ui/input";
 import { cn } from "@/app/_lib/utils/shadcn";
 import { PaginatedConversation } from "@/app/_modules/message/dto/conversation.dto";
-import { createMessageAction } from "@/app/_modules/message/message.actions";
+import {
+  createMessageAction,
+  revalidateConversationAction,
+} from "@/app/_modules/message/message.actions";
+import { MessageType } from "@/app/_modules/message/message.type";
 import { CreateMessageFormState } from "@/app/_modules/message/zod/create-message.schema";
 import { useLang } from "@/app/_providers/LangProvider";
 import { format } from "date-fns";
@@ -33,21 +37,27 @@ export default function ConversationBox({
   const pathname = usePathname();
   const router = useRouter();
   const [msg, setMsg] = React.useState("");
+  const [allMessages, setAllMessages] = React.useState<MessageType[]>([]);
   const [serverState, setServerState] =
     React.useState<CreateMessageFormState>(undefined);
 
-  const [isPending, startTransition] = useTransition();
-
   // Flatten the paginatedConversation array and sort messages by date (newest at the bottom)
-  const allMessages = paginatedConversation
-    .flatMap((page) => page.messages)
-    .sort(
-      (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
+  useEffect(() => {
+    setAllMessages(
+      paginatedConversation
+        .flatMap((page) => page.messages)
+        .sort(
+          (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
+        )
     );
+  }, [paginatedConversation]);
+
+  const [isPending, startTransition] = useTransition();
 
   const handleScroll = useCallback(() => {
     if (scrollRef.current && scrollRef.current.scrollTop === 0) {
       const lastPage = paginatedConversation[paginatedConversation.length - 1];
+      if (!lastPage || !lastPage.nextMsgId) return; // No more pages to load
       const nextPage = lastPage.page + 1;
       const nextMsgId = lastPage.nextMsgId;
 
@@ -73,6 +83,7 @@ export default function ConversationBox({
       });
       setServerState(response);
       if (response?.success) {
+        setMsg("");
         router.refresh();
       }
     });
@@ -97,6 +108,28 @@ export default function ConversationBox({
         previousScrollTop + (newScrollHeight - previousScrollHeight);
     }, 0);
   }, [paginatedConversation]); // Adjust scroll position when paginatedConversation changes
+
+  useEffect(() => {
+    if (!paginatedConversation || paginatedConversation.length === 0) return;
+    let intervalId: NodeJS.Timeout | null = null;
+    const allMsgs = paginatedConversation.flatMap((page) => page.messages);
+    if (allMsgs.length === 0) return;
+    const newestMsg = allMsgs[allMsgs.length - 1];
+    const now = Date.now();
+    const newestMsgTime = new Date(newestMsg.sentAt).getTime();
+    const diffSec = (now - newestMsgTime) / 1000;
+    const callRevalidate = () => {
+      revalidateConversationAction(postId, participantId, 1);
+    };
+    if (diffSec <= 90) {
+      intervalId = setInterval(callRevalidate, 60 * 1000);
+    } else {
+      intervalId = setInterval(callRevalidate, 15 * 60 * 1000);
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [paginatedConversation, postId, participantId]);
 
   return (
     <div
@@ -148,6 +181,7 @@ export default function ConversationBox({
           <Input
             placeholder="Type a message..."
             className="flex-1"
+            value={msg}
             onChange={(e) => {
               setMsg(e.target.value);
             }}

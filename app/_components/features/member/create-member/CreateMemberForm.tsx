@@ -187,6 +187,9 @@ export function CreateMemberForm() {
           </Button>
         </div>
       </form>
+      {serverState && serverState.fieldErrors && (
+        <p>{JSON.stringify(serverState.fieldErrors)}</p>
+      )}
     </Form>
   );
 }
