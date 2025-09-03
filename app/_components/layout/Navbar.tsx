@@ -58,7 +58,9 @@ const navMenuContent: {
   {
     title: "home",
     href: "/",
-    components: [{ title: "about-us", href: "/about-us", description: "" }],
+    components: [{ title: "about-us", href: "/about-us", description: "" },
+      { title: "donation", href: "/donation", description: "" }
+    ],
   },
   {
     title: "books",

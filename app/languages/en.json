@@ -101,6 +101,7 @@
   "cancelOrder": "Cancel Order",
   "markCompleted": "Mark as Completed",
   "noReservations": "No Reservations",
+  "orderCancelled": "Order Cancelled",
 
   "message": "Message",
   "messages": "Messages",
@@ -121,5 +122,14 @@
   "AVAILABLE": "Available",
   "CREATED": "Created",
   "RESERVED": "Reserved",
-  "DELETED": "Deleted"
+  "DELETED": "Deleted",
+
+  "donation": "Donation",
+  "donate": "Donate",
+  "donationAmount": "Donation Amount (CAD)",
+  "donateToSupport": "Donate to Support Us",
+  "donateToSupportDesc": "Your generous donation helps us maintain and improve our platform",
+  "thankYouDonation": "Thank you for your donation!",
+
+  "contact": "Contact Us"
 }

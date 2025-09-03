@@ -101,6 +101,7 @@
   "cancelOrder": "取消訂單",
   "markCompleted": "標記為已完成",
   "noReservations": "沒有預約書籍",
+  "orderCancelled": "訂單已取消",
 
   "message": "訊息",
   "messages": "訊息",
@@ -121,5 +122,14 @@
   "AVAILABLE": "可預約",
   "CREATED": "已創建",
   "RESERVED": "已預約",
-  "DELETED": "已刪除"
+  "DELETED": "已刪除",
+
+  "donation": "捐款",
+  "donate": "捐款",
+  "donationAmount": "捐款金額 (加幣)",
+  "donateToSupport": "捐款支持我們",
+  "donateToSupportDesc": "您的慷慨捐款幫助我們維護和改進平台",
+  "thankYouDonation": "感謝您的捐款！",
+
+  "contact": "聯絡我們"
 }
