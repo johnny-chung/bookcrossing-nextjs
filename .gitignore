@@ -42,3 +42,6 @@ next-env.d.ts
 
 # vs code
 *.code-workspace
+public/downloads/book_crossing.apk
+
+book_crossing.apk

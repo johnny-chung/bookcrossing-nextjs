@@ -1,5 +1,6 @@
 import Image from "next/image";
 import FadingBGImg from "@/app/_components/features/home/FadingBGImg";
+import Link from "next/link";
 import { LangType } from "@/app/languages/_lang.types";
 import { getLanguage } from "@/app/languages/_getLanguage";
 import HomeCards from "@/app/_components/features/home/HomeCards";
@@ -31,7 +32,13 @@ export default async function Home({
 
       <section className="bg-gray-100 text-black w-full py-20 mb-10 px-2 md:px-4 lg:px-8">
         <div className="flex flex-col max-w-5xl mx-auto items-center justify-center text-center">
-          Home
+          <span className="text-lg font-semibold mb-4">Home</span>
+          <Link
+            href={`/${lang}/download`}
+            className="inline-flex items-center rounded-md bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            Download Android App
+          </Link>
         </div>
         {/* <div className="mt-2 md:mt-6 flex items-center justify-center gap-x-6">
           <Link
